@@ -55,6 +55,8 @@ contract Remittance is Destructible {
 	)
 		external
 		onlyFromTrustedExchange
+		returns
+		(bool success)
 	{
 		bytes32 key = keccak256(_exchangePasswordHash, _receiverPasswordHash, tx.origin, _senderAddress);
 
@@ -65,6 +67,8 @@ contract Remittance is Destructible {
 		LogEtherWithdrawal(tx.origin, _senderAddress, _amount);
 
 		msg.sender.transfer(_amount);
+
+		return true;
 	}
 
  	/**
