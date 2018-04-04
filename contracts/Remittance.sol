@@ -7,10 +7,10 @@ import '../node_modules/zeppelin-solidity/contracts/lifecycle/Destructible.sol';
 contract Remittance is Destructible {
 	using SafeMath for uint256;
  
+ 	event LogEtherWithdrawal(address indexed receiver, address indexed sender, uint256 amount);
 	event LogNewRemittanceRequest(bytes32 key, uint256 value, uint256 validUntil);
 	event LogUpdatedRemittanceRequest(bytes32 key, uint256 value, uint256 validUntil);
 	event LogRemittanceRequestWithdrawal(address indexed receiver, address indexed sender, uint256 value);
-	event LogEtherWithdrawal(address indexed receiver, address indexed sender, uint256 amount);
 	event LogValidityDurationChange(uint256 newDuration);
 	event LogSetTrustedExchange(address indexed exchange, bool isTrusted);
  
