@@ -24,8 +24,8 @@ contract Exchange is Destructible {
 	event LogWithdrawal(address receiver, uint256 amount);
 	event LogExchangeRateChanged(uint256 newExchangeRate);
 
-	ILocalCurrency localCurrency;
-	IRemittance remittance;
+	ILocalCurrency public localCurrency;
+	IRemittance public remittance;
 
 	uint256 public exchangeRate;
 

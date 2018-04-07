@@ -1,10 +1,10 @@
-const Remittance = artifacts.require('../contracts/Remittance.sol');
-const KeccakUtil = artifacts.require('./utils/KeccakUtil.sol');
+const Remittance = artifacts.require('../../contracts/Remittance.sol');
+const KeccakUtil = artifacts.require('../utils/KeccakUtil.sol');
 
-const assertRevert = require('./utils/assertRevert');
-const watchEvent = require('./utils/watchEvent');
-const constants = require('./utils/constants');
-const increaseTime = require('./utils/increaseTime');
+const assertRevert = require('../utils/assertRevert');
+const watchEvent = require('../utils/watchEvent');
+const constants = require('../utils/constants');
+const increaseTime = require('../utils/increaseTime');
 
 contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 	let sut,
@@ -16,8 +16,8 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 	before(async () => {
 		web3.eth.defaultAccount = owner;
 		keccakUtil = await KeccakUtil.new();
-		exchangePasswordHash = await keccakUtil.encodePassword("exchange-password");
-		receiverPasswordHash = await keccakUtil.encodePassword(("receiver-password"));
+		exchangePasswordHash = await keccakUtil.encodePassword('exchange-password');
+		receiverPasswordHash = await keccakUtil.encodePassword(('receiver-password'));
 		key = await keccakUtil.encodeKey(exchangePasswordHash, receiverPasswordHash, receiver, sender);
 	});
 
@@ -25,7 +25,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		sut = await Remittance.new();
 	});
 
-	it("OWNER_TAX_DENOMINATOR constant Should have exact value", async () => {
+	it('OWNER_TAX_DENOMINATOR constant Should have exact value', async () => {
 		// Arrange
 		// Act
 		const result = await sut.OWNER_TAX_DENOMINATOR.call();
@@ -33,7 +33,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result, 1000000);
 	});
 
-	it("withdrawEther Should revert when executed from non-trusted exchange", async () => {
+	it('withdrawEther Should revert when executed from non-trusted exchange', async () => {
 		// Arrange
 		// Act
 		const result = sut.withdrawEther(exchangePasswordHash, receiverPasswordHash, sender, 100);
@@ -41,7 +41,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("withdrawEther Should revert when passed `_amount` is greater than the remittance value", async () => {
+	it('withdrawEther Should revert when passed `_amount` is greater than the remittance value', async () => {
 		// Arrange
 		await sut.setTrustedExchange(receiver, true);
 		await sut.addRemittanceRequest(key, { value: 99 });
@@ -51,7 +51,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("withdrawEther Should revert when `tx.origin` is not the `_receivereAddress` embedded in the key", async () => {
+	it('withdrawEther Should revert when `tx.origin` is not the `_receiverAddress` embedded in the key', async () => {
 		// Arrange
 		await sut.setTrustedExchange(another, true);
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -61,7 +61,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("withdrawEther Should subtract passed `_amount` from current remittance value", async () => {
+	it('withdrawEther Should subtract passed `_amount` from current remittance value', async () => {
 		// Arrange
 		await sut.setTrustedExchange(receiver, true);
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -73,7 +73,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result[0], 42);
 	});
 
-	it("withdrawEther Should raise LogEtherWithdrawal event when passed valid arguments", async () => {
+	it('withdrawEther Should raise LogEtherWithdrawal event when passed valid arguments', async () => {
 		// Arrange
 		await sut.setTrustedExchange(receiver, true);
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -91,7 +91,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result.args.amount, 100);
 	});
 
-	it("withdrawEther Should transfer `amount` ETH to the `msg.sender` when passed valid arguments", async () => {
+	it('withdrawEther Should transfer `amount` ETH to the `msg.sender` when passed valid arguments', async () => {
 		// Arrange
 		await sut.setTrustedExchange(receiver, true);
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -113,7 +113,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.deepEqual(balanceDifference, transactionCost.sub(100));
 	});
 
-	it("withdrawEther Should return true marking successful operation when passed valid arguments", async () => {
+	it('withdrawEther Should return true marking successful operation when passed valid arguments', async () => {
 		// Arrange
 		await sut.setTrustedExchange(receiver, true);
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -124,7 +124,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result, true);
 	});
 
-	it("addRemittanceRequest Should add new remittance request with exact remittance details", async () => {
+	it('addRemittanceRequest Should add new remittance request with exact remittance details', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 		// Act
@@ -135,11 +135,11 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 
 		const result = await sut.remittances.call(key);
 		// Assert
-		assert.equal(result[0], 142, "Wrong remittance value");
-		assert.deepEqual(result[1], expectedValidUntil, "Wrong remittance validUntil");
+		assert.equal(result[0], 142, 'Wrong remittance value');
+		assert.deepEqual(result[1], expectedValidUntil, 'Wrong remittance validUntil');
 	});
 
-	it("addRemittanceRequest Should raise LogNewRemittanceRequest event when adding new remittance request", async () => {
+	it('addRemittanceRequest Should raise LogNewRemittanceRequest event when adding new remittance request', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 
@@ -159,7 +159,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.deepEqual(result.args.validUntil, expectedValidUntil);
 	});
 
-	it("addRemittanceRequest Should update existing remittance request `validUntil` property when the request is not expired", async () => {
+	it('addRemittanceRequest Should update existing remittance request `validUntil` property when the request is not expired', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 		const transaction = await sut.addRemittanceRequest(key, { value: 142 });
@@ -175,7 +175,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.deepEqual(result[1], expectedValidUntil);
 	});
 
-	it("addRemittanceRequest Should update existing remittance request `validUntil` property when the request is expired", async () => {
+	it('addRemittanceRequest Should update existing remittance request `validUntil` property when the request is expired', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -193,7 +193,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.deepEqual(result[1], expectedValidUntil);
 	});
 
-	it("addRemittanceRequest Should update existing remittance request `value` property when passed valid arguments", async () => {
+	it('addRemittanceRequest Should update existing remittance request `value` property when passed valid arguments', async () => {
 		// Arrange
 		await sut.addRemittanceRequest(key, { value: 142 });
 		const valueBeforeUpdate = (await sut.remittances.call(key))[0];
@@ -205,7 +205,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(valueBeforeUpdate, valueAfterUpdate - 142);
 	});
 
-	it("addRemittanceRequest Should raise LogUpdatedRemittanceRequest event when updating existing remittance request", async () => {
+	it('addRemittanceRequest Should raise LogUpdatedRemittanceRequest event when updating existing remittance request', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 		const transaction = await sut.addRemittanceRequest(key, { value: 142 });
@@ -226,7 +226,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.deepEqual(result.args.validUntil, expectedValidUntil);
 	});
 
-	it("withdrawRemittanceRequest Should revert when the remittance request is non-existing", async () => {
+	it('withdrawRemittanceRequest Should revert when the remittance request is non-existing', async () => {
 		// Arrange
 		// Act
 		const result = sut.withdrawRemittanceRequest(exchangePasswordHash, receiverPasswordHash, receiver);
@@ -234,7 +234,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("withdrawRemittanceRequest Should revert when the remittance request is not expired", async () => {
+	it('withdrawRemittanceRequest Should revert when the remittance request is not expired', async () => {
 		// Arrange
 		await sut.addRemittanceRequest(key, { value: 142 });
 		// Act
@@ -243,7 +243,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("withdrawRemittanceRequest Should revert when `msg.sender` is not the `_senderAddress` embedded in the key", async () => {
+	it('withdrawRemittanceRequest Should revert when `msg.sender` is not the `_senderAddress` embedded in the key', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -254,7 +254,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("withdrawRemittanceRequest Should delete the given remittance request when passed valid arguments", async () => {
+	it('withdrawRemittanceRequest Should delete the given remittance request when passed valid arguments', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -268,7 +268,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result[1], 0);
 	});
 
-	it("withdrawRemittanceRequest Should raise LogRemittanceRequestWithdrawal event when passed valid arguments", async () => {
+	it('withdrawRemittanceRequest Should raise LogRemittanceRequestWithdrawal event when passed valid arguments', async () => {
 		// Arrange
 		const validityDuration = await sut.validityDuration.call();
 		await sut.addRemittanceRequest(key, { value: 142 });
@@ -287,7 +287,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result.args.value, 142);
 	});
 
-	it("withdrawRemittanceRequest Should transfer non-zero values to the `msg.sender` when passed valid arguments", async () => {
+	it('withdrawRemittanceRequest Should transfer non-zero values to the `msg.sender` when passed valid arguments', async () => {
 		// Arrange
 		await sut.addRemittanceRequest(key, { value: 142 });
 
@@ -310,7 +310,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.deepEqual(balanceDifference, transactionCost.sub(142));
 	});
 
-	it("setValidityDuration Should revert when invoked not from contract owner", async () => {
+	it('setValidityDuration Should revert when invoked not from contract owner', async () => {
 		// Arrange
 		// Act
 		const result = sut.setValidityDuration(constants.weeks(1), { from: another });
@@ -318,7 +318,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("setValidityDuration Should revert when the passed `_newDuration` argument is less than 1 day", async () => {
+	it('setValidityDuration Should revert when the passed `_newDuration` argument is less than 1 day', async () => {
 		// Arrange
 		// Act
 		const result = sut.setValidityDuration(constants.hours(1));
@@ -326,7 +326,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("setValidityDuration Should revert when the passed `_newDuration` argument is more than 1 year", async () => {
+	it('setValidityDuration Should revert when the passed `_newDuration` argument is more than 1 year', async () => {
 		// Arrange
 		// Act
 		const result = sut.setValidityDuration(constants.years(2));
@@ -334,7 +334,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("setValidityDuration Should set `validityDuration` when passed valid arguments", async () => {
+	it('setValidityDuration Should set `validityDuration` when passed valid arguments', async () => {
 		// Arrange
 		const expected = constants.days(42);
 		// Act
@@ -345,7 +345,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result, expected);
 	});
 
-	it("setValidityDuration Should raise LogValidityDurationChange event when passed valid arguments", async () => {
+	it('setValidityDuration Should raise LogValidityDurationChange event when passed valid arguments', async () => {
 		// Arrange
 		const expected = constants.days(42);
 
@@ -360,7 +360,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result.args.newDuration, expected);
 	});
 
-	it("setTrustedExchange Should revert when invoked not from owner account", async () => {
+	it('setTrustedExchange Should revert when invoked not from owner account', async () => {
 		// Arrange
 		// Act
 		const result = sut.setTrustedExchange(exchange, true, { from: another });
@@ -368,7 +368,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await assertRevert(result);
 	});
 
-	it("setTrustedExchange set exchange status when passed valid arguments", async () => {
+	it('setTrustedExchange set exchange status when passed valid arguments', async () => {
 		// Arrange
 		// Act
 		await sut.setTrustedExchange(exchange, true);
@@ -378,7 +378,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		assert.equal(result, true);
 	});
 
-	it("setTrustedExchange raise LogSetTrustedExchange when passed valid arguments", async () => {
+	it('setTrustedExchange raise LogSetTrustedExchange when passed valid arguments', async () => {
 		// Arrange
 		const event = sut.LogSetTrustedExchange();
 		const promiEvent = watchEvent(event);
