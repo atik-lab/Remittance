@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/solidity-exercises/Remittance#readme",
   "dependencies": {
+    "solidity-coverage": "^0.4.15",
     "zeppelin-solidity": "1.8.0"
   }
 }

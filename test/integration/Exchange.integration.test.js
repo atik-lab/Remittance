@@ -19,9 +19,9 @@ contract('Exchange Integration', ([owner, receiver, sender, other]) => {
 	before(async () => {
 		web3.eth.defaultAccount = owner;
 		keccakUtil = await KeccakUtil.new();
-		exchangePasswordHash = await keccakUtil.encodePassword('exchange-password');
-		receiverPasswordHash = await keccakUtil.encodePassword(('receiver-password'));
-		key = await keccakUtil.encodeKey(exchangePasswordHash, receiverPasswordHash, receiver, sender);
+		exchangePasswordHash = await keccakUtil.encodePassword.call('exchange-password');
+		receiverPasswordHash = await keccakUtil.encodePassword.call('receiver-password');
+		key = await keccakUtil.encodeKey.call(exchangePasswordHash, receiverPasswordHash, receiver, sender);
 	});
 
 	beforeEach(async () => {
