@@ -6,7 +6,7 @@ const watchEvent = require('../utils/watchEvent');
 const constants = require('../utils/constants');
 const increaseTime = require('../utils/increaseTime');
 
-contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
+contract('Remittance', ([owner, receiver, sender, exchange, other]) => {
 	let sut,
 		keccakUtil,
 		exchangePasswordHash,
@@ -53,10 +53,10 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 
 	it('withdrawEther Should revert when `tx.origin` is not the `_receiverAddress` embedded in the key', async () => {
 		// Arrange
-		await sut.setTrustedExchange(another, true);
+		await sut.setTrustedExchange(other, true);
 		await sut.addRemittanceRequest(key, { value: 142 });
 		// Act
-		const result = sut.withdrawEther(exchangePasswordHash, receiverPasswordHash, sender, 100, { from: another });
+		const result = sut.withdrawEther(exchangePasswordHash, receiverPasswordHash, sender, 100, { from: other });
 		// Assert
 		await assertRevert(result);
 	});
@@ -249,7 +249,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 		await sut.addRemittanceRequest(key, { value: 142 });
 		await increaseTime(validityDuration.toString(10) * 2);
 		// Act
-		const result = sut.withdrawRemittanceRequest(exchangePasswordHash, receiverPasswordHash, receiver, { from: another });
+		const result = sut.withdrawRemittanceRequest(exchangePasswordHash, receiverPasswordHash, receiver, { from: other });
 		// Assert
 		await assertRevert(result);
 	});
@@ -313,7 +313,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 	it('setValidityDuration Should revert when invoked not from contract owner', async () => {
 		// Arrange
 		// Act
-		const result = sut.setValidityDuration(constants.weeks(1), { from: another });
+		const result = sut.setValidityDuration(constants.weeks(1), { from: other });
 		// Assert
 		await assertRevert(result);
 	});
@@ -363,7 +363,7 @@ contract('Remittance', ([owner, receiver, sender, exchange, another]) => {
 	it('setTrustedExchange Should revert when invoked not from owner account', async () => {
 		// Arrange
 		// Act
-		const result = sut.setTrustedExchange(exchange, true, { from: another });
+		const result = sut.setTrustedExchange(exchange, true, { from: other });
 		// Assert
 		await assertRevert(result);
 	});
