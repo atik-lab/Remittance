@@ -3,6 +3,8 @@ const Remittance = artifacts.require('../../contracts/Remittance.sol');
 const LocalCurrencyFake = artifacts.require('../unit/fakes/LocalCurrencyFake.sol');
 const KeccakUtil = artifacts.require('../utils/KeccakUtil.sol');
 
+const assertRevert = require('../utils/assertRevert');
+
 contract('Exchange', ([owner, receiver, sender, exchange, another]) => {
 	let sut,
 		remittance,
